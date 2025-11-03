@@ -190,3 +190,12 @@ li:hover{
 #addbtn:hover{
     border: 2px solid white;
 }
+#title{
+  color: #b1b1b1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid rgb(70, 70, 70);
+  border-radius: 10px;
+  padding: 10px;
+}
