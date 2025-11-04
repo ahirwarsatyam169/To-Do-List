@@ -10,6 +10,9 @@ body {
   font-family: sans-serif;
   line-height: 1.4;
   padding: 0 1rem;
+  background-image: url('https://images.unsplash.com/photo-1454117096348-e4abbeba002c?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=1170');
+  background-size: cover;
+  background-repeat: no-repeat;
 }
 
 main {
@@ -138,3 +141,4 @@ li:hover{
   border-radius: 10px;
   padding: 10px;
 }
+
