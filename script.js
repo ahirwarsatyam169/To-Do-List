@@ -1,57 +1,69 @@
 let addbtn = document.querySelector("#addbtn");
-let task = document.querySelector("#task");
+let taskInput = document.querySelector("#task");
 let list = document.querySelector("#tasklist");
 
 let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 
+// Remove any empty/invalid tasks
+tasks = tasks.filter(t => t && typeof t.text === "string" && t.text.trim() !== "");
+
+function saveTasks() {
+  localStorage.setItem("tasks", JSON.stringify(tasks));
+}
+
 function renderTasks() {
   list.innerHTML = "";
-  tasks.forEach((taskText) => {
+  tasks.forEach(t => {
     let li = document.createElement("li");
-    li.textContent = taskText;
+    li.textContent = t.text;
+    if (t.completed) {
+      li.style.textDecoration = "line-through";
+    }
     list.appendChild(li);
   });
 }
-renderTasks();
 
-function addtask() {
-  let text = task.value;
-  if (!text.trim()) {
-    return;
-  }
-  tasks.push(text);
-  localStorage.setItem("tasks", JSON.stringify(tasks));
-  let li = document.createElement("li");
-  li.textContent = text;
-  list.appendChild(li);
-  task.value = "";
+// add new task
+function addTask() {
+  let text = taskInput.value.trim();
+  if (!text) return;
+
+  let newTask = { text: text, completed: false };
+  tasks.push(newTask);
+  saveTasks();
+  renderTasks();
+  taskInput.value = "";
 }
 
-addbtn.addEventListener("click", addtask);
-
-task.addEventListener("keydown", function(event) {
+addbtn.addEventListener("click", addTask);
+taskInput.addEventListener("keydown", function(event) {
   if (event.key === "Enter") {
-    addtask();
+    addTask();
   }
 });
 
-list.addEventListener("click", function (event) {
+// toggle completed on single click
+list.addEventListener("click", function(event) {
   if (event.target.tagName === "LI") {
-    const clickLi = event.target;
-    if (clickLi.style.textDecoration === "line-through") {
-      clickLi.style.textDecoration = "none";
-    } else {
-      clickLi.style.textDecoration = "line-through";
+    let clickedText = event.target.textContent;
+    let taskObj = tasks.find(t => t.text === clickedText);
+    if (taskObj) {
+      taskObj.completed = !taskObj.completed;
+      saveTasks();
+      renderTasks();
     }
   }
 });
 
-list.addEventListener("dblclick", function (event) {
+// remove on double click
+list.addEventListener("dblclick", function(event) {
   if (event.target.tagName === "LI") {
-    const clickdel = event.target;
-    const text = clickdel.textContent;
-    tasks = tasks.filter(t => t !== text);
-    localStorage.setItem("tasks", JSON.stringify(tasks));
-    clickdel.remove();
+    let clickedText = event.target.textContent;
+    tasks = tasks.filter(t => t.text !== clickedText);
+    saveTasks();
+    renderTasks();
   }
 });
+
+// initial render
+renderTasks();
