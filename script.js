@@ -4,66 +4,74 @@ let list = document.querySelector("#tasklist");
 
 let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 
-// Remove any empty/invalid tasks
-tasks = tasks.filter(t => t && typeof t.text === "string" && t.text.trim() !== "");
-
+// Save tasks
 function saveTasks() {
   localStorage.setItem("tasks", JSON.stringify(tasks));
 }
 
+// Render tasks
 function renderTasks() {
   list.innerHTML = "";
-  tasks.forEach(t => {
+
+  tasks.forEach((task, index) => {
     let li = document.createElement("li");
-    li.textContent = t.text;
-    if (t.completed) {
+    li.textContent = task.text;
+    li.dataset.index = index;
+
+    if (task.completed) {
       li.style.textDecoration = "line-through";
     }
+
     list.appendChild(li);
   });
 }
 
-// add new task
+// Add task
 function addTask() {
   let text = taskInput.value.trim();
   if (!text) return;
 
-  let newTask = { text: text, completed: false };
-  tasks.push(newTask);
+  tasks.push({
+    text: text,
+    completed: false
+  });
+
+  taskInput.value = "";
   saveTasks();
   renderTasks();
-  taskInput.value = "";
 }
 
 addbtn.addEventListener("click", addTask);
-taskInput.addEventListener("keydown", function(event) {
-  if (event.key === "Enter") {
+
+taskInput.addEventListener("keydown", function (e) {
+  if (e.key === "Enter") {
     addTask();
   }
 });
 
-// toggle completed on single click
-list.addEventListener("click", function(event) {
-  if (event.target.tagName === "LI") {
-    let clickedText = event.target.textContent;
-    let taskObj = tasks.find(t => t.text === clickedText);
-    if (taskObj) {
-      taskObj.completed = !taskObj.completed;
-      saveTasks();
-      renderTasks();
-    }
-  }
-});
+// Handle click + double click
+list.addEventListener("click", function (event) {
+  if (event.target.tagName !== "LI") return;
 
-// remove on double click
-list.addEventListener("dblclick", function(event) {
-  if (event.target.tagName === "LI") {
-    let clickedText = event.target.textContent;
-    tasks = tasks.filter(t => t.text !== clickedText);
+  let index = event.target.dataset.index;
+
+  // SINGLE CLICK
+  if (event.detail === 1) {
+    setTimeout(() => {
+      if (event.detail === 1) {
+        tasks[index].completed = !tasks[index].completed;
+        saveTasks();
+        renderTasks();
+      }
+    }, 200);
+  }
+
+  // DOUBLE CLICK
+  if (event.detail === 2) {
+    tasks.splice(index, 1);
     saveTasks();
     renderTasks();
   }
 });
 
-// initial render
 renderTasks();
